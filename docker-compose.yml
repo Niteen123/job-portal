@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  frontend-service:
+    build: ./frontend-service
+    ports:
+      - "3000:8000"
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8000:8000"
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8001:8000"
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "8002:8000"
+
+  job-service:
+    build: ./job-service
+    ports:
+      - "8003:8000"
+
+  application-service:
+    build: ./application-service
+    ports:
+      - "8004:8000"
