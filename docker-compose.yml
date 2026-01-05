@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   frontend-service:
     build: ./frontend-service
@@ -10,6 +8,11 @@ services:
     build: ./api-gateway
     ports:
       - "8000:8000"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - USER_SERVICE_URL=http://user-service:8000
+      - JOB_SERVICE_URL=http://job-service:8000
+      - APPLICATION_SERVICE_URL=http://application-service:8000
 
   auth-service:
     build: ./auth-service
