@@ -11,5 +11,6 @@ curl -s -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"niteen","password":"pass123"}' | jq .
 
-echo -e "\n✅ Tests Complete!"
+echo ""
+echo "Tests Complete!"
 

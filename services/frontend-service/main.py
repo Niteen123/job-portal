@@ -1,5 +1,5 @@
 def main():
-    print("Hello from frontend-service!")
+    print("Hello from job-service!")
 
 
 if __name__ == "__main__":

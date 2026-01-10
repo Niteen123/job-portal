@@ -2,7 +2,7 @@
 
 A scalable job portal platform like Naukri/Workday/Monster Jobs built with microservices architecture.
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 This is a production-ready microservices-based job portal application with 9 services:
 
@@ -110,16 +110,16 @@ pytest tests/
 
 ## Features
 
-- ✅ Microservices architecture
-- ✅ API Gateway pattern for request routing
-- ✅ Request ID tracking across services
-- ✅ Structured logging and middleware
-- ✅ Docker containerization
-- ✅ Health check endpoints
-- ✅ Error handling and service resilience
-- 🚀 Async events and message queues (planned)
-- 🚀 Database integration (planned)
-- 🚀 Authentication with JWT (planned)
+- Microservices architecture
+- API Gateway pattern for request routing
+- Request ID tracking across services
+- Structured logging and middleware
+- Docker containerization
+- Health check endpoints
+- Error handling and service resilience
+- Async events and message queues (planned)
+- Database integration (planned)
+- Authentication with JWT (planned)
 
 ## Environment Variables
 

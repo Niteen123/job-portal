@@ -1,35 +1,211 @@
 services:
-  frontend-service:
-    build: ./frontend-service
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: job-portal-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-jobportal}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-job_portal}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
     ports:
-      - "3000:8000"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/database/init-db.sh:/docker-entrypoint-initdb.d/00-init-db.sh
+      - ./infra/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-jobportal}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - job-portal-network
 
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: job-portal-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - job-portal-network
+
+  # API Gateway
   api-gateway:
-    build: ./api-gateway
+    build: ./services/api-gateway
+    container_name: job-portal-gateway
     ports:
       - "8000:8000"
     environment:
       - AUTH_SERVICE_URL=http://auth-service:8000
       - USER_SERVICE_URL=http://user-service:8000
+      - EMPLOYER_SERVICE_URL=http://employer-service:8000
       - JOB_SERVICE_URL=http://job-service:8000
       - APPLICATION_SERVICE_URL=http://application-service:8000
+      - RESUME_SERVICE_URL=http://resume-service:8000
+      - SEARCH_SERVICE_URL=http://search-service:8000
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8000
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - job-portal-network
 
+  # Auth Service
   auth-service:
-    build: ./auth-service
+    build: ./services/auth-service
+    container_name: job-portal-auth
     ports:
       - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production}
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
 
+  # User Service
   user-service:
-    build: ./user-service
+    build: ./services/user-service
+    container_name: job-portal-user
     ports:
       - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
 
+  # Employer Service
+  employer-service:
+    build: ./services/employer-service
+    container_name: job-portal-employer
+    ports:
+      - "8005:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
+
+  # Job Service
   job-service:
-    build: ./job-service
+    build: ./services/job-service
+    container_name: job-portal-job
     ports:
       - "8003:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
 
+  # Application Service
   application-service:
-    build: ./application-service
+    build: ./services/application-service
+    container_name: job-portal-application
     ports:
       - "8004:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
+
+  # Resume Service
+  resume-service:
+    build: ./services/resume-service
+    container_name: job-portal-resume
+    ports:
+      - "8006:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - STORAGE_PATH=/app/uploads
+      - LOG_LEVEL=INFO
+    volumes:
+      - resume_storage:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
+
+  # Search Service
+  search-service:
+    build: ./services/search-service
+    container_name: job-portal-search
+    ports:
+      - "8007:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
+
+  # Notification Service
+  notification-service:
+    build: ./services/notification-service
+    container_name: job-portal-notification
+    ports:
+      - "8008:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-jobportal}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-job_portal}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job-portal-network
+
+  # Frontend Service (placeholder)
+  frontend-service:
+    build: ./services/frontend-service
+    container_name: job-portal-frontend
+    ports:
+      - "3000:8000"
+    environment:
+      - LOG_LEVEL=INFO
+    networks:
+      - job-portal-network
+
+volumes:
+  postgres_data:
+  resume_storage:
+
+networks:
+  job-portal-network:
+    driver: bridge
