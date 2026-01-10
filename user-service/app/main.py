@@ -1,15 +1,14 @@
 from fastapi import FastAPI
+from app.middleware.request_id import RequestIDMiddleware
+from app.middleware.logging import LoggingMiddleware
 
-app = FastAPI(title="User Service")
+SERVICE_NAME = "juserservice"
+
+app = FastAPI(title=SERVICE_NAME)
+
+app.add_middleware(RequestIDMiddleware)
+app.add_middleware(LoggingMiddleware)
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "user"}
-
-@app.get("/users/{user_id}")
-def get_user(user_id: int):
-    return {
-        "id": user_id,
-        "name": "John Doe",
-        "email": "john.doe@example.com"
-    }
+    return {"status": "ok", "service": SERVICE_NAME}
