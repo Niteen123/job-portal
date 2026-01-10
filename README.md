@@ -1,23 +1,28 @@
-# Job Portal - Microservices Application
+# Job Portal - Microservices Architecture
 
-A modern microservices-based job portal application built with FastAPI and Docker.
+A scalable job portal platform like Naukri/Workday/Monster Jobs built with microservices architecture.
 
-## Architecture
+## 🏗️ Architecture Overview
 
-The application consists of multiple independent microservices:
+This is a production-ready microservices-based job portal application with 9 services:
 
-- **API Gateway** (Port 8000): Central entry point for all requests
-- **Auth Service** (Port 8001): Authentication and authorization
-- **User Service** (Port 8002): User profile management
-- **Job Service** (Port 8003): Job listings management
-- **Application Service** (Port 8004): Job applications handling
-- **Frontend Service** (Port 3000): Web interface
+- **API Gateway** (Port 8000): Central request routing
+- **Auth Service** (Port 8001): Authentication & JWT tokens
+- **User Service** (Port 8002): Job seeker profiles
+- **Employer Service** (Port 8005): Company/employer profiles
+- **Job Service** (Port 8003): Job postings management
+- **Application Service** (Port 8004): Job applications tracking
+- **Resume Service** (Port 8006): Resume upload & storage
+- **Search Service** (Port 8007): Advanced job search
+- **Notification Service** (Port 8008): Email & notifications
+- **Frontend Service** (Port 3000): UI placeholder
 
 ## Quick Start
 
 ### Prerequisites
-- Docker
-- Docker Compose
+- Docker & Docker Compose
+- Python 3.12+ (for local development)
+- uv package manager
 - Python 3.12+
 
 ### Running the Application
