@@ -29,9 +29,28 @@ class UserResponse(BaseModel):
 class LoginResponse(BaseModel):
     """Schema for login response"""
     access_token: str
+    refresh_token: str
     token_type: str
     user: UserResponse
 
-class TokenData(BaseModel):
-    """Schema for token claims"""
-    user_id: int
+class RefreshTokenRequest(BaseModel):
+    """Schema for refresh token request"""
+    refresh_token: str
+
+class RefreshTokenResponse(BaseModel):
+    """Schema for refresh token response"""
+    access_token: str
+    token_type: str
+
+class PasswordResetRequest(BaseModel):
+    """Schema for password reset request"""
+    email: EmailStr
+
+class PasswordResetConfirm(BaseModel):
+    """Schema for confirming password reset"""
+    token: str
+    new_password: str
+
+class PasswordResetResponse(BaseModel):
+    """Schema for password reset response"""
+    message: str
